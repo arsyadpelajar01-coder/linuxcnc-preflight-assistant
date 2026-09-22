@@ -2,6 +2,9 @@ import json
 import urllib.request
 import zmq
 import time
+import os
+import tkinter as tk
+from tkinter import filedialog
 
 def jalankan_audit_ai():
     print("\n" + "="*55)
@@ -55,33 +58,47 @@ def jalankan_audit_ai():
     return True 
 
 def kirim_instruksi_cnc():
-    print("Menghubungkan ke jaringan kontrol mesin (ZeroMQ)...")
-    context = zmq.Context()
-    socket = context.socket(zmq.PUB)
-    socket.connect("tcp://127.0.0.1:5555")
+    print("🛠️  MODE OPERATOR: Membuka jendela pemilihan file...")
     
-    time.sleep(1) 
+    # Menyiapkan jendela GUI (menyembunyikan jendela utama Tkinter yang kosong)
+    root = tk.Tk()
+    root.withdraw()
     
-    # Vektor manufaktur propeler 3 bilah
-    gcode_propeller_3_bilah = """
-G0 Z10
-G0 X20 Y20
-G1 Z-2 F100
-G1 X40 Y40 F200
-G0 Z10
-G0 X-20 Y20
-G1 Z-2 F100
-G1 X-40 Y40 F200
-G0 Z10
-G0 X0 Y-20
-G1 Z-2 F100
-G1 X0 Y-40 F200
-G0 Z10
-G0 X0 Y0
-"""
-    print("Menembakkan vektor pergerakan propeler 3 bilah ke mesin...")
-    socket.send_string(gcode_propeller_3_bilah.strip())
-    print("🎯 Eksekusi otomatis berhasil dipicu!")
+    # Membuka dialog pemilihan file
+    path_file = filedialog.askopenfilename(
+        title="Pilih File Desain G-Code",
+        filetypes=(
+            ("G-Code Files", "*.ngc *.gcode *.nc"),
+            ("Text Files", "*.txt"),
+            ("Semua File", "*.*")
+        )
+    )
+    
+    # Jika operator menekan 'Cancel' atau menutup jendela
+    if not path_file:
+        print("❌ Operasi dibatalkan: Operator tidak memilih file desain.")
+        return
+
+    print(f"✅ File dipilih: {path_file}")
+    
+    # Membaca file dan mengirimkan ke mesin
+    try:
+        with open(path_file, 'r') as file:
+            gcode_operator = file.read()
+            
+        print("Menghubungkan ke jaringan kontrol mesin (ZeroMQ)...")
+        context = zmq.Context()
+        socket = context.socket(zmq.PUB)
+        socket.connect("tcp://127.0.0.1:5555")
+        
+        time.sleep(1) # Jeda untuk memastikan koneksi ZMQ stabil
+        
+        print("🚀 Menembakkan vektor pergerakan ke mesin...")
+        socket.send_string(gcode_operator.strip())
+        print("🎯 Eksekusi otomatis berhasil dipicu!")
+        
+    except Exception as e:
+        print(f"❌ ERROR saat membaca atau mengirim file: {e}")
 
 if __name__ == "__main__":
     status_aman = jalankan_audit_ai()
