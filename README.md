@@ -1,23 +1,17 @@
-# LinuxCNC Pre-Flight Assistant 🚀
+# 🚀 LinuxCNC Pre-Flight Assistant (IBM Bob 2.0)
 
-A cognitive safety bridge between AI decision-making and industrial machine execution. Built for the IBM Bob 2.0 Hackathon.
+A cognitive safety bridge between AI decision-making and industrial machine (CNC) execution. Built specifically for the IBM Bob 2.0 Hackathon to perform automated safety audits before the machine is allowed to move.
 
-## Overview
-This project introduces an automated "Pre-Flight" audit system for industrial 3-Axis milling machines. Before executing complex maneuvers, the system securely transmits machine configurations (`.hal` & `.ini`) and G-Code logic to **IBM Bob 2.0**. The AI analyzes the payload against safety manuals to detect pin logic conflicts or velocity violations.
+## ✨ Key Features
+- **Auto G-Code Detection:** Reads the file opened by the operator in *real-time* directly from the LinuxCNC interface without requiring manual terminal input.
+- **AI Safety Audit:** Verifies cutting parameters and machine safety boundaries (*software limits*) using IBM Bob 2.0 prior to execution.
+- **Zero-Touch Operator Experience:** Supports *desktop shortcut* integration so CNC operators can work purely using the GUI (graphical user interface) naturally.
 
-The demonstration payload features a precision G-Code maneuver for manufacturing a balanced 3-blade propeller, designed to symbolize the three members of our group. 
-
-If clearance is granted, the system utilizes a high-speed ZeroMQ (ZMQ) Publisher/Subscriber architecture to instantly trigger the hardware execution natively within the LinuxCNC environment.
-
-## Architecture
-1. **The Brain (`pre_flight_ai.py`):** Acts as the cognitive gateway. It handles API communication with IBM Bob 2.0 and acts as a ZMQ Publisher to dispatch validated G-Code.
-2. **The Muscle (`cnc_subscriber.py`):** Runs natively inside the Debian/LinuxCNC virtual environment. It operates as a ZMQ Subscriber, converting network payloads directly into MDI commands via the `linuxcnc` HAL Python API.
-
-## About the Developer
-Developed by Arsyad Mulya Rahman, integrating principles of Mechanical Engineering from Universitas Andalas with modern AI automation to enhance industrial safety.
-
-## Quick Start
-1. Start the machine environment and ensure it is powered ON (E-Stop disabled).
-2. Run the hardware execution node in a terminal:
-   ```bash
-   python3 cnc_subscriber.py
+## ⚙️ Usage Guide
+1. Ensure you have a configured LinuxCNC (Debian) environment.
+2. *Clone* this repository:
+   `git clone https://github.com/arsyadpelajar01-coder/linuxcnc-preflight-assistant.git`
+3. Grant execution permissions to the scripts:
+   `chmod +x run_all.sh start_assistant.sh`
+4. Run the system with just a single command (or link it to a *desktop shortcut*):
+   `./run_all.sh`
