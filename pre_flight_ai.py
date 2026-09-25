@@ -1,7 +1,7 @@
 import os
 import time
 import linuxcnc
-import requests
+import subprocess
 
 # 1. Mengambil API Key yang sudah diset di sistem operasi secara aman
 BOB_API_KEY = os.environ.get("BOB_API_KEY")
@@ -12,49 +12,39 @@ if not BOB_API_KEY:
     print('export BOB_API_KEY="kunci_rahasia_anda"')
     exit(1)
 
-# 2. Endpoint URL Standar (Jika Anda menggunakan panggilan HTTP langsung)
-# Jika dokumentasi tidak menyebut URL khusus, URL umum ini digunakan untuk platform berbasis OpenAI-compatible API.
-BOB_API_URL = "https://bob.ibm.com/api/v1/chat/completions"
-
 def analyze_gcode_with_bob(filepath):
-    # ... (Sisa fungsi ini sama persis dengan yang saya berikan sebelumnya) ...
+    """Membaca header G-code dan mengirimkannya ke IBM Bob CLI untuk audit keselamatan."""
     try:
         # Optimasi: Kita hanya membaca 50 baris pertama (header & setup) 
-        # agar tidak melebihi batas token API AI
+        # agar tidak membebani pemrosesan AI
         with open(filepath, 'r') as file:
             lines = [next(file) for _ in range(50) if file]
         gcode_snippet = "".join(lines)
         
-        headers = {
-            "Authorization": f"Bearer {BOB_API_KEY}",
-            "Content-Type": "application/json"
-        }
+        # Menggabungkan instruksi sistem dan kode CNC menjadi satu teks prompt
+        prompt_text = (
+            "Anda adalah auditor keselamatan mesin CNC. Analisis potongan G-code berikut. "
+            "Periksa apakah kecepatan (F) dan pergerakan sumbu (G0/G1) aman. "
+            "Berikan jawaban singkat: AMAN beserta alasannya, atau BAHAYA beserta peringatannya.\n\n"
+            f"Tolong periksa G-code ini:\n{gcode_snippet}"
+        )
         
-        # Format payload standar AI (Sesuaikan dengan format dokumentasi IBM Bob)
-        payload = {
-            "model": "bob-base", 
-            "messages": [
-                {
-                    "role": "system", 
-                    "content": "Anda adalah auditor keselamatan mesin CNC. Analisis potongan G-code berikut. Periksa apakah kecepatan (F) dan pergerakan sumbu (G0/G1) aman. Berikan jawaban singkat: AMAN beserta alasannya, atau BAHAYA beserta peringatannya."
-                },
-                {
-                    "role": "user", 
-                    "content": f"Tolong periksa G-code ini:\n{gcode_snippet}"
-                }
-            ]
-        }
+        # Format eksekusi CLI: bob run "prompt"
+        result = subprocess.run(
+            ["bob", "run", prompt_text],
+            capture_output=True,
+            text=True,
+            check=True
+        )
         
-        response = requests.post(BOB_API_URL, headers=headers, json=payload)
+        # Mengambil hasil keluaran teks dari Bob Shell
+        ai_message = result.stdout.strip()
+        return f"🛡️ [HASIL AUDIT IBM BOB]:\n{ai_message}"
         
-        if response.status_code == 200:
-            result = response.json()
-            # Mengekstrak pesan dari format JSON
-            ai_message = result.get('choices', [{}])[0].get('message', {}).get('content', 'Tidak ada respons dari AI')
-            return f"🛡️ [HASIL AUDIT IBM BOB]:\n{ai_message}"
-        else:
-            return f"⚠️ [ERROR API]: Gagal menghubungi server. Status: {response.status_code}\nDetail: {response.text}"
-            
+    except subprocess.CalledProcessError as e:
+        return f"⚠️ [ERROR BOB CLI]: Proses gagal dengan kode {e.returncode}\nDetail: {e.stderr.strip()}"
+    except FileNotFoundError:
+        return "❌ [ERROR SISTEM]: Aplikasi 'bob' tidak ditemukan di sistem ini. Pastikan IBM Bob Shell sudah terinstal."
     except Exception as e:
         return f"❌ [ERROR AUDIT]: {str(e)}"
 
@@ -72,7 +62,7 @@ def get_active_gcode_file():
                 print(f"\n✅ [BERHASIL] File terdeteksi: {s.file}")
                 print("🔍 [AI AUDIT] Meminta clearance keselamatan dari IBM Bob 2.0...")
                 
-                # Mengganti fungsi simulasi sleep dengan pemanggilan API asli
+                # Menggunakan fungsi CLI yang baru
                 audit_result = analyze_gcode_with_bob(s.file)
                 print(audit_result)
                 
