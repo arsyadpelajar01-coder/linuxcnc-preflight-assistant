@@ -1,16 +1,19 @@
 #!/bin/bash
 
+# 🔥 Otomatis matikan proses subscriber yang nyangkut di port 5555
+pkill -f cnc_subscriber.py 2>/dev/null || true
+sleep 1
+
 # 1. Load existing key if available
 if [ -f "$HOME/.bob_api_key" ]; then
     source "$HOME/.bob_api_key"
 fi
 
-# 2. Require non-empty input (Pelindung dari input kosong)
+# 2. Require non-empty input
 while [ -z "$BOB_API_KEY" ]; do
     echo "⚠️ IBM Bob API Key is missing or empty!"
     read -p "Please paste your API Key here and press Enter: " input_key
     
-    # Cek apakah teks yang dimasukkan ada isinya
     if [ -n "$input_key" ]; then
         echo "export BOB_API_KEY=\"$input_key\"" > "$HOME/.bob_api_key"
         export BOB_API_KEY="$input_key"
