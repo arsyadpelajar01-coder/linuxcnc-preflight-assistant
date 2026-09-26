@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# 🔥 Otomatis matikan proses subscriber yang nyangkut di port 5555
+# 🔥 Automatically terminate stale subscriber processes on port 5555
 pkill -f cnc_subscriber.py 2>/dev/null || true
 sleep 1
 
