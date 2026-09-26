@@ -20,4 +20,4 @@ Before installing, ensure your Debian/LinuxCNC machine has the following configu
 You do not need to manually clone this repository. Simply open your Linux terminal and run this single command to download the assistant and automatically generate a Desktop shortcut:
 
 ```bash
-wget -qO- [https://raw.githubusercontent.com/arsyadpelajar01-coder/linuxcnc-preflight-assistant/main/install.sh](https://raw.githubusercontent.com/arsyadpelajar01-coder/linuxcnc-preflight-assistant/main/install.sh) | bash
+wget -qO- https://raw.githubusercontent.com/arsyadpelajar01-coder/linuxcnc-preflight-assistant/main/install.sh | bash
