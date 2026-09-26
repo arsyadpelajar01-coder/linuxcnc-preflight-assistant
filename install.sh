@@ -6,10 +6,13 @@ echo "📥 Downloading LinuxCNC Pre-Flight Assistant..."
 cd ~
 
 # Hapus instalasi lama jika ada untuk menghindari konflik
-rm -rf linuxcnc-preflight-assistant
+rm -rf linuxcnc-preflight-assistant linuxcnc-preflight-assistant-main
 
-# Unduh repositori dari GitHub
-git clone https://github.com/arsyadpelajar01-coder/linuxcnc-preflight-assistant.git
+# Unduh versi arsip (tar.gz) langsung dari GitHub (Tanpa menggunakan Git)
+wget -qO- https://github.com/arsyadpelajar01-coder/linuxcnc-preflight-assistant/archive/refs/heads/main.tar.gz | tar xz
+
+# Ubah nama folder hasil ekstrak agar sesuai
+mv linuxcnc-preflight-assistant-main linuxcnc-preflight-assistant
 cd linuxcnc-preflight-assistant
 
 echo "⚙️ Setting up permissions..."
