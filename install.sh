@@ -2,30 +2,30 @@
 
 echo "📥 Downloading LinuxCNC Pre-Flight Assistant..."
 
-# Pindah ke direktori Home
+# Move to the user's home directory
 cd ~
 
-# Hapus instalasi lama jika ada untuk menghindari konflik
+# Remove previous installation if it exists to prevent conflicts
 rm -rf linuxcnc-preflight-assistant linuxcnc-preflight-assistant-main
 
-# Unduh versi arsip (tar.gz) langsung dari GitHub (Tanpa menggunakan Git)
+# Download archive (tar.gz) directly from GitHub without requiring Git
 wget -qO- https://github.com/arsyadpelajar01-coder/linuxcnc-preflight-assistant/archive/refs/heads/main.tar.gz | tar xz
 
-# Ubah nama folder hasil ekstrak agar sesuai
+# Rename extracted directory to the target project name
 mv linuxcnc-preflight-assistant-main linuxcnc-preflight-assistant
 cd linuxcnc-preflight-assistant
 
 echo "⚙️ Setting up permissions..."
-# Jadikan skrip bash bisa dieksekusi
+# Make bash scripts executable
 chmod +x start_assistant.sh
 chmod +x run_all.sh
 
 echo "🖥️ Creating Desktop shortcut..."
-# Path ke Desktop pengguna di Linux
+# Resolve the user's Desktop directory path
 DESKTOP_DIR=$(xdg-user-dir DESKTOP 2>/dev/null || echo "$HOME/Desktop")
 SHORTCUT="$DESKTOP_DIR/PreFlight_AI.desktop"
 
-# Membuat file konfigurasi aplikasi Linux
+# Generate Linux desktop entry configuration
 cat > "$SHORTCUT" << EOL
 [Desktop Entry]
 Version=1.0
@@ -38,7 +38,7 @@ Terminal=true
 Categories=Utility;Engineering;
 EOL
 
-# Jadikan ikon di desktop bisa diklik
+# Make the desktop shortcut executable
 chmod +x "$SHORTCUT"
 
 echo "======================================================"
