@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Load environment variables (Crucial for reading API Key via Desktop Shortcut)
+source ~/.bashrc
+
 echo "🚀 Preparing Pre-Flight Assistant System..."
 
 # Get the directory where this script is located
