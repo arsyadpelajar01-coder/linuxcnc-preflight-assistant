@@ -15,4 +15,5 @@ Before installing, ensure your Debian/LinuxCNC machine has the following configu
 ## 📥 1-Click Installation
 You do not need to manually clone this repository. Simply open your Linux terminal and run this single command to download ZeroCrash AI and automatically generate a Desktop shortcut:
 
+```bash
 wget -qO- https://raw.githubusercontent.com/arsyadpelajar01-coder/linuxcnc-preflight-assistant/main/install.sh | bash
